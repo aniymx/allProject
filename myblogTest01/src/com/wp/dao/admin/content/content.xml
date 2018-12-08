@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wp.dao.admin.content.IAdminContentDao">
+
+	<cache type="org.mybatis.caches.ehcache.LoggingEhcache" >  
+         <property name="timeToIdleSeconds" value="3600"/><!-- 单位是秒 -->
+         <property name="timeToLiveSeconds" value="3600"/><!-- 单位是秒 -->
+         <property name="maxEntriesLocalHeap" value="1000"/> 
+         <property name="maxEntriesLocalDisk" value="10000000"/> 
+         <property name="memoryStoreEvictionPolicy" value="LRU"/> 
+     </cache> 
+     
+	<!-- 查询内容 -->
+	<select id="findContents" resultType="Content" parameterType="WpParams">
+		SELECT 
+			c.id,
+			c.title,
+			c.content,
+			c.create_time AS createTime,
+			c.update_time AS updateTime,
+			c.static_link AS staticLink,
+			c.tag,
+			c.img,
+			c.is_top AS isTop,
+			c.is_delete AS isDelete,
+			c.status,
+			c.channel_id AS channelId,
+			c.push,
+			c.is_comment AS isComment,
+			c.hits,
+			c.comments,
+			c.loves,
+			c.keywords,
+			c.description,
+			c.author,
+			ch.name as channelName
+		FROM 
+		wp_content AS c LEFT JOIN wp_channel AS ch ON c.channel_id = ch.id
+		<where>
+			<if test="@com.wp.util.Utils@isNotEmpty(channelId)">
+				c.channel_id = #{channelId}
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(keyword)">
+				AND c.title LIKE '%${keyword}%' 
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==1"><!-- 今天 -->
+				AND TO_DAYS(create_time) = to_days(now())
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==2"><!-- 昨天-->
+				AND <![CDATA[AND TO_DAYS(NOW())-TO_DAYS(create_time)=1]]>
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==3"><!-- 近五天-->
+				AND <![CDATA[AND DATE_SUB(NOW(), INTERVAL 5 DAY) <= date(create_time)]]>
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==4"><!-- 本周 -->
+				AND  WEEKOFYEAR(create_time)=WEEKOFYEAR(NOW())
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==5"><!-- 上周 -->
+				AND YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())-1
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==6"><!-- 本月 -->
+				AND date_format(create_time,'%Y-%m')=date_format(now(),'%Y-%m')
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==7"><!-- 上月 -->
+				AND date_format(create_time,'%Y-%m')=date_format(DATE_SUB(NOW(), INTERVAL 1 MONTH),'%Y-%m')
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==8"><!-- 上季度 -->
+				AND  QUARTER(create_time)=QUARTER(DATE_SUB(now(),interval 1 QUARTER))
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==9"><!-- 本季度 -->
+				AND  QUARTER(create_time)=QUARTER(now())
+			</if>
+		</where>
+		<if test="@com.wp.util.Utils@isNotEmpty(order)">
+			ORDER BY ${order}
+		</if>
+		LIMIT #{pageNo}, #{pageSize}	
+	</select>
+	<!-- 查询总数 -->
+	<select id="count" resultType="int" parameterType="WpParams">
+		SELECT 
+			count(1)
+		FROM 
+		wp_content AS c LEFT JOIN wp_channel AS ch ON c.channel_id = ch.id
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="@com.wp.util.Utils@isNotEmpty(channelId)">
+				c.channel_id = #{channelId}
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(keyword)">
+				AND c.title LIKE '%${keyword}%' 
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(push)">
+				AND c.push = #{push}
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==1"><!-- 今天 -->
+				AND TO_DAYS(create_time) = to_days(now())
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==2"><!-- 昨天-->
+				AND <![CDATA[AND TO_DAYS(NOW())-TO_DAYS(create_time)=1]]>
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==3"><!-- 近五天-->
+				AND <![CDATA[AND DATE_SUB(NOW(), INTERVAL 5 DAY) <= date(create_time)]]>
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==4"><!-- 本周 -->
+				AND  WEEKOFYEAR(create_time)=WEEKOFYEAR(NOW())
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==5"><!-- 上周 -->
+				AND YEARWEEK(date_format(create_time,'%Y-%m-%d')) = YEARWEEK(now())-1
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==6"><!-- 本月 -->
+				AND date_format(create_time,'%Y-%m')=date_format(now(),'%Y-%m')
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==7"><!-- 上月 -->
+				AND date_format(create_time,'%Y-%m')=date_format(DATE_SUB(NOW(), INTERVAL 1 MONTH),'%Y-%m')
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==8"><!-- 上季度 -->
+				AND  QUARTER(create_time)=QUARTER(DATE_SUB(now(),interval 1 QUARTER))
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(mark) and mark==9"><!-- 本季度 -->
+				AND  QUARTER(create_time)=QUARTER(now())
+			</if>
+		</trim>
+	</select>
+	<!-- 修改状态的方法 -->
+	<update id="update" parameterType="Content">
+		UPDATE wp_content 
+		<set>
+			<if test="@com.wp.util.Utils@isNotEmpty(staticLink)">
+				static_link = #{staticLink},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(isDelete)">
+				is_delete = #{isDelete},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(status)">
+				status = #{status},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(isTop)">
+				is_top = #{isTop},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(push)">
+				push = #{push},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(isComment)">
+				is_comment = #{isComment},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(updateTime)">
+				update_time = #{updateTime},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(hits)">
+				hits = #{hits},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(loves)">
+				loves = #{loves},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	<!-- 修改内容的方法 -->
+	<update id="updateCon" parameterType="Content">
+		UPDATE wp_content 
+		<set>
+			<if test="@com.wp.util.Utils@isNotEmpty(title)">
+				title = #{title},
+			</if>	
+			<if test="@com.wp.util.Utils@isNotEmpty(content)">
+				content = #{content},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(img)">	
+				img = #{img},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(channelId)">	
+				channel_id = #{channelId},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(keywords)">	
+				keywords = #{keywords},
+			</if>	
+			<if test="@com.wp.util.Utils@isNotEmpty(description)">	
+				description = #{description},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(updateTime)">
+				update_time = #{updateTime}
+			</if>	
+		</set>
+		WHERE id = #{id};
+	</update>
+	<!-- 根据ID获取内容 -->
+	<select id="getContent" resultType="Content" >
+		SELECT 
+			id,
+			title,
+			content,
+			create_time AS createTime,
+			update_time AS updateTime,
+			static_link AS staticLink,
+			tag,
+			img,
+			is_top AS isTop,
+			is_delete AS isDelete,
+			status,
+			channel_id AS channelId,
+			push,
+			is_comment AS isComment,
+			hits,
+			comments,
+			loves,
+			keywords,
+			description,
+			author
+		FROM 
+		wp_content
+			WHERE id = #{id}
+	</select>
+	<insert id="add" parameterType="Content">
+		INSERT INTO wp_content (
+			title,
+			content,
+			img,
+			channel_id,
+			keywords,
+			description,
+			author
+		) VALUES(
+			#{title},
+			#{content},
+			#{img},
+			#{channelId},
+			#{keywords},
+			#{description},
+			#{author}
+		);
+	</insert>
+</mapper>  

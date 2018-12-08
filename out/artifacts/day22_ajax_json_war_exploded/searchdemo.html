@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script !src="">
+        $(function () {
+
+            $("#divShow").hide();
+            $("#in").blur(function () {
+                // $("#divShow").show().slideDown();
+                var val = $("#in").val();
+                $.get("searchServlet", {value: val}, function (data) {
+                  // alert(data);
+                    $("#divShow").empty();
+                    if (data!=null) {
+                        $("#divShow").show().slideDown("slow");
+                        for(key in data){
+                           // alert(key+":"+data[key])
+                            $("#divShow").append("<span>"+data[key]+"</span>"+"<br>")
+                        }
+
+
+                        //  append("<p>"+)
+                      //  $("#divShow").html(data)
+                    }
+
+                },"json")
+
+            })
+
+        })
+    </script>
+
+    <style>
+        .divShow {
+            border: 1px solid grey;
+            width: 200px;
+            height: 300px;
+        }
+
+        .in {
+            height: 35px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+<input type="text" class="in" id="in" name="in">
+<div id="divShow" class="divShow">
+
+</div>
+</body>
+</html>

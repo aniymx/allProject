@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-jsptaglibrary_2_0.xsd"
+  version="2.0">
+    
+  <description>自定义函数标签</description>
+  <display-name>wp functions</display-name>
+  <tlib-version>1.1</tlib-version>
+  <short-name>wp</short-name>
+  <uri></uri>
+  <!-- ******************************************tag自定义标签开始****************************************** -->
+  <tag>
+  	<!-- 标签的描述  -->
+  	<description>循环标签</description>
+  	<!-- 标签的名字  -->
+  	<name>loop</name>
+  	<!-- 对应标签的类 -->
+  	<tag-class>com.wp.tag.WpLoop</tag-class>
+	<!-- 
+		决定标签体 
+		empty:没有标签体
+		scriptless:你的标签可以用EL表达式或者JSP的动作元素 但是不能用jsp脚本（一般用这个）
+		JSP:可以支持JSP动作元素 。解析el表达式 和jsp所有动作部分
+		tagdependent：忽略动作部分 打印纯文本
+	-->
+	<body-content>scriptless</body-content>
+	<!-- 属性 -->
+	<attribute>
+		<!-- 属性名称 -->
+		<name>items</name>
+		<!-- 属性是否是必须的 如果不写 会报错 默认为false -->
+		<required>true</required>
+		<!-- 是否在运行期间支持el表达式 默认为false -->
+		<rtexprvalue>true</rtexprvalue>
+	</attribute>
+	<attribute>
+		<!-- 属性名称 -->
+		<name>var</name>
+		<!-- 属性是否是必须的 如果不写 会报错 默认为false -->
+		<required>true</required>
+		<!-- 是否在运行期间支持el表达式 默认为false -->
+		<rtexprvalue>false</rtexprvalue>
+	</attribute>
+  </tag> 
+  <tag>
+  	<!-- 标签的描述  -->
+  	<description>权限标签</description>
+  	<!-- 标签的名字  -->
+  	<name>permission</name>
+  	<!-- 对应标签的类 -->
+  	<tag-class>com.wp.core.PermissionTag</tag-class>
+	<!-- 
+		决定标签体 
+		empty:没有标签体
+		scriptless:你的标签可以用EL表达式或者JSP的动作元素 但是不能用jsp脚本（一般用这个）
+		JSP:可以支持JSP动作元素 。解析el表达式 和jsp所有动作部分
+		tagdependent：忽略动作部分 打印纯文本
+	-->
+	<body-content>JSP</body-content>
+	<!-- 属性 -->
+	<attribute>
+		<!-- 属性名称 -->
+		<name>model</name>
+		<!-- 属性是否是必须的 如果不写 会报错 默认为false -->
+		<required>true</required>
+		<!-- 是否在运行期间支持el表达式 默认为false -->
+		<rtexprvalue>false</rtexprvalue>
+	</attribute>
+	<attribute>
+		<name>method</name>
+		<required>true</required>
+		<rtexprvalue>false</rtexprvalue>
+	</attribute>
+  </tag> 
+  <tag>
+  	<description>打印次数</description>
+  	<name>printNum</name>
+  	<tag-class>com.wp.tag.PrintNum</tag-class>
+  	<body-content>scriptless</body-content>
+  	<attribute>
+  		<name>num</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>index</name>
+  		<required>false</required>
+  		<rtexprvalue>false</rtexprvalue>
+  	</attribute>
+  </tag>
+  <tag>
+  	<description>字母转为大写</description>
+  	<name>upperCase</name>
+  	<tag-class>com.wp.tag.WpUpperCase</tag-class>
+  	<body-content>scriptless</body-content>
+  	<attribute>
+  		<name>count</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
+  <tag>
+  	<description>获取内容</description>
+  	<name>getContents</name>
+  	<tag-class>com.wp.tag.ContentListTag</tag-class>
+  	<body-content>scriptless</body-content>
+  	<attribute>
+  		<name>channelId</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>pageNo</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>pageSize</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>var</name>
+  		<required>false</required>
+  		<rtexprvalue>false</rtexprvalue>
+  	</attribute>
+  </tag>
+  	<!-- if else 标签 -->
+  <tag>
+  	<description>if</description>
+  	<name>if</name>
+  	<tag-class>com.wp.tag.WpIFTag</tag-class>
+  	<body-content>scriptless</body-content>
+  	<attribute>
+  		<name>test</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
+  <tag>
+  	<description>else if</description>
+  	<name>elseif</name>
+  	<tag-class>com.wp.tag.WpElseIfTag</tag-class>
+  	<body-content>scriptless</body-content>
+  	<attribute>
+  		<name>test</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
+  <tag>
+  	<description>then</description>
+  	<name>then</name>
+  	<tag-class>com.wp.tag.WpThenTag</tag-class>
+  	<body-content>scriptless</body-content>
+  </tag>
+  <tag>
+  	<description>else</description>
+  	<name>else</name>
+  	<tag-class>com.wp.tag.WpElseTag</tag-class>
+  	<body-content>scriptless</body-content>
+  </tag>
+  <tag>
+  	<description>a标签</description>
+  	<name>a</name>
+  	<tag-class>com.wp.tag.LinkTag</tag-class>
+  	<body-content>empty</body-content>
+  	<attribute>
+  		<name>text</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>href</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>id</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>className</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>html</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
+  <tag>
+  	<description>自定义内容获取标签</description>
+  	<name>contentBean</name>
+  	<tag-class>com.wp.tag.ContentBeanTag</tag-class>
+  	<body-content>empty</body-content>
+  	<attribute>
+  		<name>var</name>
+  		<required>false</required>
+  		<rtexprvalue>false</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>cid</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>channelId</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
+ <tag>
+  	<description>自定义内容获取标签</description>
+  	<name>contentList</name>
+  	<tag-class>com.wp.tag.ContentListTag</tag-class>
+  	<body-content>JSP</body-content>
+  	<attribute>
+  		<name>var</name>
+  		<required>false</required>
+  		<rtexprvalue>false</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>isDelete</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>mark</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>channelId</name>
+  		<required>true</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>pageSize</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>pageNo</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  	<attribute>
+  		<name>keyword</name>
+  		<required>false</required>
+  		<rtexprvalue>true</rtexprvalue>
+  	</attribute>
+  </tag>
+ <!-- ******************************************函数自定义标签开始****************************************** -->
+  <function>
+  	<!-- 标签描述  -->
+    <description> 格式化日期 </description>
+    <!-- 标签名称  -->
+    <name>formatDate</name>
+    <function-class>com.wp.tag.WpFunction</function-class>
+    <function-signature>java.lang.String formatDate(java.util.Date, java.lang.String)</function-signature>
+    <example>${wp:formatDate(new Date(),"yyyy/MM/dd")}</example>
+  </function>
+  <function>
+    <description> 日期转换为中文 </description>
+    <name>timeFormat</name>
+    <function-class>com.wp.tag.WpFunction</function-class>
+    <function-signature>java.lang.String getTimeFormat(java.util.Date)</function-signature>
+    <example>${wp:timeFormat(new Date())}</example>
+  </function>
+  <function>
+  	<description> 转换字母</description>
+  	<name>getCharacter</name>
+  	<function-class>com.wp.tag.WpFunction</function-class>
+  	<function-signature>java.lang.String getCharacter(int)</function-signature>
+ 	<example>${wp:getCharacter(1)==>A}</example>
+  </function>
+  <function>
+  	<description>数字转换为中文</description>
+ 	<name>chinesCharacter</name>
+ 	<function-class>com.wp.tag.WpFunction</function-class>
+ 	<function-signature>java.lang.String chinesCharacter(int)</function-signature>
+ 	<example>${wp:chinesCharacter(100)==>一百}</example>
+  </function>
+  <function>
+  	<description>数字转换为中文金额</description>
+ 	<name>getMoney</name>
+ 	<function-class>com.wp.tag.WpFunction</function-class>
+ 	<function-signature>java.lang.String getMoney(java.lang.String)</function-signature>
+ 	<example>${wp:getMoney(99999)==>玖万玖仟玖佰玖拾玖元}</example>
+  </function>
+  <function>
+  	<description>得到ip地址的位置</description>
+  	<name>getIpAddress</name>
+  	<function-class>com.wp.tag.WpFunction</function-class>
+	<function-signature>java.lang.String getIpAddress(java.lang.String)</function-signature>
+	<example>${wp:getIpAddress("127.0.0.1") ==>本地}</example>
+  </function>
+  <function>
+  	<description>检测内容里是否包含搜索的字符串</description>
+  	<name>indexOf</name>
+  	<function-class>com.wp.tag.WpFunction</function-class>
+	<function-signature>int indexOf(java.lang.String,java.lang.String)</function-signature>
+	<example>${wp:indexOf("aaaa","132") ==> -1}</example>
+  </function>
+</taglib>

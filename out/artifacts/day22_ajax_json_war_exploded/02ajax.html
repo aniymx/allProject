@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script !src="">
+        function fun() {
+            $.ajax(
+                {
+                    url:"ajaxServlet",
+                    type:"post",
+                    data:{"username":"zhangsan","password":"123"},
+                    dataType:"text",
+                    success:function (data) {
+                       alert(data)
+
+                    },
+                    error:function () {
+                        alert("error")
+
+                    }
+                }
+
+
+            )
+
+        }
+
+    </script>
+</head>
+<body>
+<input type="button" value="submit" onclick="fun()">
+<input type="text">
+</body>
+</html>

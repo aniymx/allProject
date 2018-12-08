@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<script !src="">
+    window.onload = function () {
+        var check = document.getElementById("check");
+        check.onclick = function () {
+            var date = new Date().getTime();
+            // alert(date);
+            check.src = "/day15/checkCode02?"+date;
+            
+        };
+        document.getElementById("link").onclick = function () {
+            var check = document.getElementById("check");
+            var date = new Date();
+            check.src = "/day15/checkCode02?"+date;
+
+        }
+    }
+</script>
+<body>
+<img src="/day15/checkCode02" alt="" id="check">
+<a href="javascript:void(0)" id="link">看不清换一张</a>
+</body>
+</html>

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+     xmlns:p="http://www.springframework.org/schema/p"
+     xmlns:task="http://www.springframework.org/schema/task"
+     xmlns:tx="http://www.springframework.org/schema/tx"
+     xmlns:aop="http://www.springframework.org/schema/aop"
+     xsi:schemaLocation="
+     	http://www.springframework.org/schema/tx 
+     	http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/beans 
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop.xsd
+        http://www.springframework.org/schema/task 
+        http://www.springframework.org/schema/task/spring-task-4.0.xsd">
+   <!-- 扫dao和service -->    
+	<context:component-scan base-package="com.wp.dao,com.wp.service" />
+	<!-- 定时任务 -->
+	<!-- <task:annotation-driven /> -->
+	<!-- 引入数据的db资源文件 -->
+	<bean class="com.wp.core.des.EncryptPropertyPlaceholderConfigurer"
+		p:location="classpath:db/jdbc.properties" p:fileEncoding="utf-8" />
+	<!-- 配置c3p0连接池-->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+	    <property name="driverClass" value="${jdbc.driver}"></property>
+	 	<property name="jdbcUrl" value="${jdbc.url}"></property>
+	 	<property name="user" value="${jdbc.username}"></property>
+	 	<property name="password" value="${jdbc.password}"></property>	
+	    <property name="acquireIncrement" value="${c3p0.acquireIncrement}"></property>  
+	    <property name="initialPoolSize" value="${c3p0.initialPoolSize}"></property>  
+	    <property name="maxIdleTime" value="${c3p0.maxIdleTime}"></property>  
+	    <property name="maxPoolSize" value="${c3p0.maxPoolSize}"></property>  
+	    <property name="minPoolSize" value="${c3p0.minPoolSize}"></property>  
+	    <property name="idleConnectionTestPeriod" value="${c3p0.idleConnectionTestPeriod}"></property>  
+	    <property name="maxStatements" value="${c3p0.maxStatements}"></property>  
+	    <property name="numHelperThreads" value="${c3p0.numHelperThreads}"></property>  
+	    <property name="testConnectionOnCheckout" value="${c3p0.testConnectionOnCheckout}"></property>  
+	    <property name="preferredTestQuery" value="${c3p0.preferredTestQuery}"></property>  
+	     <!--重新尝试的时间间隔，默认为：1000毫秒--> 
+	    <property name="acquireRetryDelay" value="1000"></property>  
+	    <!--定义在从数据库获取新连接失败后重复尝试的次数。默认值: 30 ；小于等于0表示无限次-->  
+	    <property name="acquireRetryAttempts" value="60"></property>  
+	    <!--如果为false，则获取连接失败将会引起所有等待连接池来获取连接的线程抛出异常，但是数据源仍有效保留，
+		    并在下次调用getConnection()的时候继续尝试获取连接。如果设为true，
+		    那么在尝试获取连接失败后该数据源将申明已断开并永久关闭。默认: false-->   
+	    <property name="breakAfterAcquireFailure" value="false"></property> 
+	</bean>
+	<!-- 配置mybati -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />  
+        <!-- 自动扫描mapping.xml文件 -->  
+        <property name="mapperLocations" >
+        	<list>
+        		<value>classpath:com/wp/dao/**.xml</value>
+        		<value>classpath:com/wp/dao/**/*.xml</value>
+        	</list>
+        </property>  
+        <!-- 注册mybatisbean别名 -->
+        <property name="typeAliasesPackage" value="com.wp.bean"></property>
+	</bean>
+	<!-- 	mybatis的mapper转换器 也就是说的接口，里面原理是采用的jdk的动态代理实现的-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.wp.dao"></property>
+	</bean>
+	<!-- 事物 spring提供了两类事务管理器接口的实现
+	DataSourceTransactionManager ,HibernateTransactionManager-->
+	<bean id="transactionManager"
+	  class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+	    <property name="dataSource" ref="dataSource" />
+	</bean>
+		<!-- 基本事务定义，使用transactionManager做事务管理，默认get*，find*方法的事务为read-only -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="find*" read-only="true" />
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="add*" propagation="REQUIRED"/>
+			<tx:method name="update*" propagation="REQUIRED"/>
+			<tx:method name="delete*" propagation="REQUIRED"/>
+			<tx:method name="save*" propagation="REQUIRED"/>
+			<tx:method name="*" propagation="REQUIRED" />
+		</tx:attributes>		
+	</tx:advice>
+	
+	<!-- 配置aop， spring是通过aop来进行事务管理的 -->
+	<aop:config>
+		<!-- 设置pointCut表示那些方法要加入事务处理 -->
+		<!-- 以下的事务是声明在dao中的，但是通常都会在service来处理多个业务对象逻辑的关系，注入删除，更新等，此时如果在执行了一个步骤之后抛出异常
+		 	  就会导致数据不完整，所以事务不应该在dao层处理，而应在service，这也是spring所提供的一个非常方便的工具，声明式事务-->
+		<aop:pointcut id="interceptorPointCuts"
+			expression="execution(* com.wp.service.*.*.*(..)) and execution(* com.wp.service.*.*.*.*(..))"/> 
+		<!-- 通过advisor来确定具体要加入事务控制的方法 -->
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="interceptorPointCuts"/>
+	</aop:config>
+	<!-- 使用注解方式 -->
+	<!-- <tx:annotation-driven transaction-manager="transactionManager"/> -->
+	
+	<import resource="classpath:springmvc/applicationContext-kaptcha.xml"/>
+	<!-- <import resource="classpath:springmvc/applicationContext-log.xml"/> -->
+</beans>

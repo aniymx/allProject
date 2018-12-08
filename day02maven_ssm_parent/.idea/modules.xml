@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/day02_ssm_controller/day02_ssm_controller.iml" filepath="$PROJECT_DIR$/day02_ssm_controller/day02_ssm_controller.iml" />
+      <module fileurl="file://$PROJECT_DIR$/day02_ssm_dao/day02_ssm_dao.iml" filepath="$PROJECT_DIR$/day02_ssm_dao/day02_ssm_dao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/day02_ssm_service/day02_ssm_service.iml" filepath="$PROJECT_DIR$/day02_ssm_service/day02_ssm_service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/day02maven_ssm_parent.iml" filepath="$PROJECT_DIR$/day02maven_ssm_parent.iml" />
+    </modules>
+  </component>
+</project>

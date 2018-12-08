@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wp.dao.IChannelDao">
+	
+	<!-- 根据名字查询栏目-->
+	<select id="getChannelByName" resultType="Channel" >
+		SELECT 
+			id,
+			name,
+			description,
+			create_time as createTime,
+			is_delete as isDelete,
+			sort,
+			model,
+			url,
+			status,
+			update_time,
+			parent_id
+		FROM 
+		wp_channel
+			WHERE is_delete = 0 AND status = 1 AND model = #{name}
+	</select>
+	
+</mapper>  

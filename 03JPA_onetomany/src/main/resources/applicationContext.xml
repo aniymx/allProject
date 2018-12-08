@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/data/jpa
+		http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+    <!--spring and springdata configuration-->
+    <!--将entityManager交给spring进行管理-->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置扫描的实体类的包-->
+        <property name="packagesToScan" value="com.itheima.domain"/>
+
+        <!--配置jpa的实现厂家-->
+        <property name="persistenceProvider">
+            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
+        </property>
+
+        <!--配置jpa供应商适配器-->
+        <property name="jpaVendorAdapter">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+                <property name="showSql" value="true"/>
+                <!--是否自动创建数据库-->
+                <property name="generateDdl" value="false"/>
+                <!--是否支持数据库的方言-->
+                <property name="databasePlatform" value="org.hibernate.dialect.MySQLDialect"/>
+                <!--指定数据库的类型-->
+                <property name="database" value="MYSQL"/>
+            </bean>
+        </property>
+
+<!--注入jpa的基本配置-->
+        <!--加载jpa的基本配置信息和jpa实现方式 -->
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <!--是否显示 SQL-->
+                <prop key="hibernate.show_sql">true</prop>
+                <!--如果显示 SQL，输出的 SQL 时候要格式化-->
+                <prop key="hibernate.format_sql">true</prop>
+                <!--是否每次进行执行时候删除并创建数据库(create),而update是在首次执行时候进行数据库的创建-->
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+            </props>
+        </property>
+        <!--配置jpa的方言-->
+        <property name="jpaDialect">
+            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+        </property>
+    </bean>
+    <!--配置数据源-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql:///jpa03"/>
+        <property name="user" value="root"/>
+        <property name="password" value="123"/>
+    </bean>
+    <!--整合springdataJpa-->
+    <jpa:repositories base-package="com.itheima.dao" entity-manager-factory-ref="entityManagerFactory"
+                      transaction-manager-ref="transactionManager"/>
+    <!--配置事务管理器-->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+    <!--   事务传播行为类型-->
+    <!--
+    PROPAGATION_REQUIRED
+    如果当前没有事务，就新建一个事务，如果已经存在一个事务中，加入到这个事务中。这是最常见的选择。
+    PROPAGATION_SUPPORTS
+    支持当前事务，如果当前没有事务，就以非事务方式执行。
+    PROPAGATION_MANDATORY
+    使用当前的事务，如果当前没有事务，就抛出异常。
+    PROPAGATION_REQUIRES_NEW
+    新建事务，如果当前存在事务，把当前事务挂起。
+    PROPAGATION_NOT_SUPPORTED
+    以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。
+    PROPAGATION_NEVER
+    以非事务方式执行，如果当前存在事务，则抛出异常。
+    PROPAGATION_NESTED
+    如果当前存在事务，则在嵌套事务内执行。如果当前没有事务，则执行与PROPAGATION_REQUIRED类 似的操作
+        -->
+    <!--<tx:advice>
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+            <tx:method name="delete*" propagation="REQUIRED"/>
+            <tx:method name="get*" read-only="true"/>
+            <tx:method name="find*" read-only="true"/>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>-->
+
+    <!--配置包扫描-->
+    <context:component-scan base-package="com.itheima"/>
+
+</beans>

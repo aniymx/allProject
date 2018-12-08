@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wp.dao.ILinkDao">
+	<!-- 获取所有的链接 -->
+	<select id="getLinks" resultType="Link">
+		SELECT id,name,link,create_time as createTime FROM wp_link;
+	</select>	
+	<!-- 添加链接 -->
+	<insert id="saveLink" useGeneratedKeys="true" keyProperty="id" parameterType="Link" >
+		<!-- 返回ID的一种
+		<selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
+            select LAST_INSERT_ID()
+        </selectKey> -->
+        
+		INSERT INTO wp_link(
+			name,link
+		) VALUES(#{name},#{link});	
+	</insert>
+	<!-- 删除友链 -->
+	<delete id="delLink" >
+		DELETE FROM wp_link WHERE id = #{0};
+	</delete>
+	<!-- 修改友链 -->
+	<update id="updateLink" parameterType="Link">
+		UPDATE wp_link
+		<set>
+			<if test="@com.wp.util.Utils@isNotEmpty(name)">
+				name = #{name},
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(link)">
+				link = #{link},
+			</if>
+		</set>	
+		WHERE id = #{id}
+	</update>
+</mapper>  

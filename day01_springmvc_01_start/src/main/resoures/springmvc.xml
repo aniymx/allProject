@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd">
+    <!--开启包扫描-->
+    <context:component-scan base-package="com.itheima"></context:component-scan>
+
+    <!--配置视图解析对象-->
+    <bean id="internalResourceViewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+
+        <property name="prefix" value="/WEB-INF/pages/"/>
+
+
+        <property name="suffix" value=".jsp"/>
+    </bean>
+<!--开启springmvc注解的支持-->
+    <mvc:annotation-driven/>
+    <!--3.0以上可以使用 静态资源过滤-->
+    <mvc:default-servlet-handler></mvc:default-servlet-handler>
+<bean id="sysExceptionResolver" class="com.itheima.exception.SysExceptionResolver"></bean>
+
+
+    <mvc:interceptors>
+        <mvc:interceptor>
+            <mvc:mapping path="/user/*"/>
+            <bean class="com.itheima.intercepter.MyIntersepter01"/>
+        </mvc:interceptor>
+
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.itheima.intercepter.MyIntersepter02"></bean>
+        </mvc:interceptor>
+    </mvc:interceptors>
+
+
+</beans>

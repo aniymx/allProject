@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wp.dao.admin.role.IRoleDao">
+	<!-- 添加角色 -->
+	<insert id="addRole"  useGeneratedKeys="true" keyProperty="id" parameterType="Role">
+		INSERT INTO wp_role(
+			name,
+			description				
+		)	VALUES(
+			#{name},
+			#{description}
+		)
+	</insert>
+	
+	<select id="findRoles" resultType="Role" parameterType="WpParams">
+		SELECT 
+			id,
+			name,
+			create_time AS createTime,
+			description,
+			is_delete AS isDelete,
+			update_time AS updateTime,
+			user_id AS userId
+		FROM 
+		wp_role
+		<where>
+			<if test="@com.wp.util.Utils@isNotEmpty(keyword)">
+				name LIKE '%${keyword}%' 
+			</if>
+		</where>
+		<if test="@com.wp.util.Utils@isNotEmpty(order)">
+			ORDER BY ${order}
+		</if>
+		LIMIT #{pageNo}, #{pageSize}	
+	</select>
+	<select id="count" resultType="int" parameterType="WpParams">
+		SELECT 
+			count(1)
+		FROM 
+		wp_role
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="@com.wp.util.Utils@isNotEmpty(channelId)">
+				channel_id = #{channelId}
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(keyword)">
+				 title LIKE '%${keyword}%' 
+			</if>
+		</trim>
+	</select>
+	<!-- 查询过滤之后所有角色的信息 -->
+	<select id="findFilterUsers" resultType="java.util.HashMap" parameterType="WpParams">
+		SELECT id,username,email FROM wp_user WHERE id NOT
+		IN(SELECT USER_ID FROM WP_ROLE_USER WHERE  role_id = #{roleId})
+		<where>
+			<if test="@com.wp.util.Utils@isNotEmpty(keyword)">
+				name LIKE '%${keyword}%' 
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(isDelete)">
+				is_delete = #{isDelete}
+			</if>
+		</where>
+		LIMIT #{pageNo}, #{pageSize}
+	</select>
+	<!-- 查询过滤之后所有角色的信息的总数 -->
+	<select id="countFilterUsers" resultType="int" parameterType="WpParams">
+		SELECT count(1) FROM wp_user WHERE id NOT
+		IN(SELECT USER_ID FROM WP_ROLE_USER WHERE  role_id = #{roleId})
+		<where>
+			<if test="@com.wp.util.Utils@isNotEmpty(keyword)">
+				name LIKE '%${keyword}%' 
+			</if>
+			<if test="@com.wp.util.Utils@isNotEmpty(isDelete)">
+				is_delete = #{isDelete}
+			</if>
+		</where>
+		LIMIT #{pageNo}, #{pageSize}
+	</select>
+	
+	<!-- 保存角色分配的用户-->
+	<insert id="saveRoleUsers" >
+		INSERT INTO wp_role_user(
+			user_id,role_id
+		)VALUES (
+			#{userId},
+			#{roleId}
+		)
+	</insert>
+	<!-- 删除角色分配的用户-->
+	<delete id="delRoleUsers">
+		DELETE FROM wp_role_user WHERE user_id = #{userId} AND role_id = ${roleId}
+	</delete>
+	<!-- 保存角色分配的权限 -->
+	<insert id="saveRolePermission" >
+		INSERT INTO wp_role_permission(role_id,permission_id) VALUES(#{roleId},${permissionId})
+	</insert>
+	<!-- 删除角色分配的权限 -->
+	<delete id="delRolePermission" >
+		DELETE FROM wp_role_permission WHERE role_id = #{roleId}
+	</delete>
+	<!-- 查询过滤后的权限 -->
+	<select id="findFilterPermissions" resultType="java.util.HashMap">
+		SELECT id,name FROM wp_permission WHERE id IN
+		(SELECT PERMISSION_ID FROM WP_ROLE_PERMISSION WHERE  role_id = #{roleId})
+	</select>
+	<!-- 查询过滤后的权限总数 -->
+	<select id="countFilterPermissions" resultType="int">
+		SELECT count(0) FROM wp_permission WHERE id IN
+		(SELECT PERMISSION_ID FROM WP_ROLE_PERMISSION WHERE  role_id = #{roleId})
+	</select>
+	<!-- 查询一个用户所拥有的的角色 -->
+	<select id="findRolesByUserId" resultType="java.util.HashMap">
+		SELECT GROUP_CONCAT(name) as name,
+		CONVERT(GROUP_CONCAT(id),CHARACTER) as rids 
+		FROM wp_role_user  ru LEFT JOIN wp_role r ON r.id = ru.role_id
+				WHERE ru.user_id =#{userId}
+	</select>
+</mapper>  
+

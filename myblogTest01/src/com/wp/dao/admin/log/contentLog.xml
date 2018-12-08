@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wp.dao.admin.log.IContentLogDao">
+	<!-- 获取一年中每个月的内容数量 -->
+	<select id="groupContent" parameterType="WpParams" resultType="java.util.HashMap">
+		SELECT
+			DATE_FORMAT(create_time, '%m') as m,
+			count(1) as num
+		FROM
+			wp_content
+		WHERE
+			DATE_FORMAT(create_time, '%Y') = #{logYear}
+		GROUP BY m
+		ORDER BY m
+	</select>
+	<!-- 获取该月的详细内容 -->
+	<select id="getContentsByMonth" resultType="java.util.Map" parameterType="WpParams">
+		SELECT 
+		id ,
+		title,
+		create_time as createTime 
+		FROM wp_content
+		WHERE DATE_FORMAT(create_time,'%m') = #{logMonth}
+		ORDER BY ${order}
+				limit #{pageNo},#{pageSize}
+	</select>
+	<!-- 获取该月的总数 -->
+	<select id="contentCount" resultType="int" parameterType="WpParams">
+		SELECT 
+			count(1)
+		FROM wp_content
+		WHERE DATE_FORMAT(create_time,'%m') = #{logMonth}
+	</select>
+</mapper>  
+

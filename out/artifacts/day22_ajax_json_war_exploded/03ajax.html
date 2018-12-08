@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="js/jquery-3.3.1.js"></script>
+    <script !src="">
+        function fun() {
+            $.get("ajaxServlet", {username: "xiaoiong"}, function (data) {
+                alert(data);
+
+            }, "text")
+        }
+
+    </script>
+</head>
+<body>
+<input type="button" value="submit" onclick="fun()">
+<input type="text">
+</body>
+</html>

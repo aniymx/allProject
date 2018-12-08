@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wp.dao.admin.permission.IPermissionDao">
+	<!-- 查询根节点 -->
+	<select id="findPermissionRoot" resultType="Permission" parameterType="WpParams">
+		SELECT id,name,url,method FROM wp_permission WHERE is_delete = 0 AND parent_id IS NULL;
+	</select>
+	<!-- 查询子节点 -->
+	<select id="findPermissionChildren" resultType="Permission" >
+		SELECT id,name,url,method FROM wp_permission WHERE is_delete = 0 AND parent_id = #{id};
+	</select>
+	<select id="count" resultType="int" parameterType="WpParams">
+		SELECT 
+			count(1)
+		FROM 
+		wp_permission
+		<trim prefix="WHERE" prefixOverrides="AND | OR">
+			<if test="@com.wp.util.Utils@isNotEmpty(keyword)">
+				name LIKE = '${keyword}'
+			</if>
+		</trim>
+	</select>
+	<!-- 查询用户所拥有的权限 -->
+	<select id="findUserPermission" resultType="java.util.HashMap">
+		SELECT 
+			p.url,p.model,p.method FROM wp_permission p
+			LEFT JOIN wp_role_permission rp ON rp.permission_id = p.id
+			LEFT JOIN wp_role r ON r.id = rp.role_id
+			LEFT JOIN wp_role_user u ON u.role_id = r.id
+		WHERE 
+			u.user_id = ${userId}
+		GROUP BY p.url
+	</select>
+</mapper>  
+
